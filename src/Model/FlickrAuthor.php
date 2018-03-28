@@ -1,6 +1,8 @@
 <?php
 namespace Suilven\Flickr\Model;
 
+use SilverStripe\ORM\DataObject;
+
 class FlickrAuthor extends DataObject
 {
     private static $db = array(
@@ -11,7 +13,7 @@ class FlickrAuthor extends DataObject
         'NSID' => 'Varchar(255)'
     );
 
-    private static $has_many = array('FlickrPhotos' => 'FlickrPhoto');
+    private static $has_many = array('FlickrPhotos' => 'Suilven\Flickr\Model\FlickrPhoto');
 
     private static $summary_fields = array(
         'PathAlias' => 'URL',

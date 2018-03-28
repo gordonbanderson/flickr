@@ -1,13 +1,10 @@
 <?php
 namespace Suilven\Flickr\Model;
-
-require_once "phpFlickr.php";
+use SilverStripe\ORM\DataObject;
 
 class FlickrPhoto extends DataObject
 {
-
-
-    static $db = array(
+    private static $db = array(
         'Title' => 'Varchar(255)',
         'FlickrID' => 'Varchar',
         'Description' => 'HTMLText',
@@ -15,12 +12,7 @@ class FlickrPhoto extends DataObject
         'TakenAt' => 'Datetime',
         'DateGranularity' => 'Int',
         'FlickrLicenseID' => 'Int',
-        /*
-        0   Y-m-d H:i:s
-        4   Y-m
-        6   Y
-        8   Circa...
-         */
+
         'FlickrLastUpdated' => 'Date',
         'GeoIsPublic' => 'Boolean',
         'FlickrWoeID' => 'Int',
@@ -77,29 +69,29 @@ class FlickrPhoto extends DataObject
     );
 
 
-    static $belongs_many_many = array(
-        'FlickrSets' => 'FlickrSet'
+    private static $belongs_many_many = array(
+        'FlickrSets' => 'Suilven\Flickr\Model\FlickrSet'
     );
 
 
     // this one is what created the database FlickrPhoto_FlickrTagss
-    static $many_many = array(
-        'FlickrTags' => 'FlickrTag'
+    private static $many_many = array(
+        'FlickrTags' => 'Suilven\Flickr\Model\FlickrTag'
     );
 
 
-    static $has_many = array(
-        'Exifs' => 'FlickrExif'
+    private static $has_many = array(
+        'Exifs' => 'Suilven\Flickr\Model\FlickrExif'
     );
 
 
-    static $has_one = array(
+    private static $has_one = array(
         'LocalCopyOfImage' => 'Image',
-        'Photographer' => 'FlickrAuthor'
+        'Photographer' => 'Suilven\Flickr\Model\FlickrAuthor'
     );
 
 
-    public static $summary_fields = array(
+    private static $summary_fields = array(
         'Thumbnail' => 'Thumbnail',
         'Title' => 'Title',
         'TakenAt' => 'TakenAt',

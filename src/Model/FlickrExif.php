@@ -1,11 +1,12 @@
 <?php
 
 namespace Suilven\Flickr\Model;
+use SilverStripe\ORM\DataObject;
 
 class FlickrExif extends DataObject
 {
 
-    static $db = array(
+    private static $db = array(
         'TagSpace' => 'Varchar',
         'Tag' => 'Varchar',
         'Label' => 'Varchar',
@@ -13,11 +14,11 @@ class FlickrExif extends DataObject
         'TagSpaceID' => 'Int'
     );
 
-    static $belongs_many_many = array(
-        'FlickrPhotos' => 'FlickrPhoto'
+    private static $belongs_many_many = array(
+        'FlickrPhotos' => 'Suilven\Flickr\Model\FlickrPhoto'
      );
 
-    static $has_one = array(
-        'FlickrPhoto' => 'FlickrPhoto'
+    private static $has_one = array(
+        'FlickrPhoto' => 'Suilven\Flickr\Model\FlickrPhoto'
     );
 }

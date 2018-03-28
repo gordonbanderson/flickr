@@ -1,10 +1,10 @@
 <?php
 namespace Suilven\Flickr\Model;
+use SilverStripe\ORM\DataObject;
 
 class FlickrSet extends DataObject
 {
-
-    static $db = array(
+    private static $db = array(
         'Title' => 'Varchar(255)',
         'FlickrID' => 'Varchar',
         'Description' => 'HTMLText',
@@ -22,26 +22,26 @@ class FlickrSet extends DataObject
         'LockGeo' => true
     );
 
-    static $many_many = array(
-        'FlickrPhotos' => 'FlickrPhoto'
+    private static $many_many = array(
+        'FlickrPhotos' => 'Suilven\Flickr\Model\FlickrPhoto'
     );
 
     // this is the assets folder
-    static $has_one = array (
+    private static $has_one = array (
         'AssetFolder' => 'Folder',
-        'PrimaryFlickrPhoto' => 'FlickrPhoto'
+        'PrimaryFlickrPhoto' => 'Suilven\Flickr\Model\FlickrPhoto'
     );
 
 
     /// model admin
-    static $searchable_fields = array(
+    private static $searchable_fields = array(
         'Title',
         'Description',
         'FlickrID'
     );
 
 
-    public static $default_sort = 'FirstPictureTakenAt DESC';
+    private static $default_sort = 'FirstPictureTakenAt DESC';
 
 
 
