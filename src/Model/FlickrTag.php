@@ -1,74 +1,76 @@
 <?php
 namespace Suilven\Flickr\Model;
 
-class FlickrTag extends DataObject {
+class FlickrTag extends DataObject
+{
 
-	static $db = array(
-		'Value' => 'Varchar(255)',
-		'FlickrID' => 'Varchar(255)',
-		'RawValue' => 'HTMLText'
-	);
+    static $db = array(
+        'Value' => 'Varchar(255)',
+        'FlickrID' => 'Varchar(255)',
+        'RawValue' => 'HTMLText'
+    );
 
-	static $display_fields = array(
-		'RawValue'
-	);
-
-
-	static $searchable_fields = array(
-		'RawValue'
-	);
-
-	static $summary_fields = array(
-		'Value',
-		'RawValue',
-		'FlickrID'
-	);
-
-	static $belongs_many_many = array(
-		'FlickrPhotos' => 'FlickrPhoto'
-	);
+    static $display_fields = array(
+        'RawValue'
+    );
 
 
-	public function NormaliseCount($c) {
-		return log(doubleval($c),2);
-	}
+    static $searchable_fields = array(
+        'RawValue'
+    );
+
+    static $summary_fields = array(
+        'Value',
+        'RawValue',
+        'FlickrID'
+    );
+
+    static $belongs_many_many = array(
+        'FlickrPhotos' => 'FlickrPhoto'
+    );
 
 
-	// this is required so the grid field autocompleter returns readable entries after searching
-	function Title() {
-		return $this->RawValue;
-	}
+    public function NormaliseCount($c)
+    {
+        return log(doubleval($c), 2);
+    }
 
 
-	/*
-	Static helper
-	*/
-	public static function CreateOrFindTags($csv) {
-		$result = new ArrayList();
+    // this is required so the grid field autocompleter returns readable entries after searching
+    function Title()
+    {
+        return $this->RawValue;
+    }
 
-		if (trim($csv) == '') {
-			return $result; // ie empty array
-		}
 
-		$tags = explode(',', $csv);
-		foreach($tags as $tagName) {
-			$tagName = trim($tagName);
-			if (!$tagName) {
-				continue;
-			}
-			$ftag = DataList::create('FlickrTag')->where("Value='".strtolower($tagName)."'")->first();
-			if (!$ftag) {
-				$ftag = FlickrTag::create();
-				$ftag->RawValue = $tagName;
-				$ftag->Value  = strtolower($tagName);
-				$ftag->write();
-			}
+    /*
+    Static helper
+    */
+    public static function CreateOrFindTags($csv)
+    {
+        $result = new ArrayList();
 
-			$result->add($ftag);
+        if (trim($csv) == '') {
+            return $result; // ie empty array
+        }
 
-		}
+        $tags = explode(',', $csv);
+        foreach ($tags as $tagName) {
+            $tagName = trim($tagName);
+            if (!$tagName) {
+                continue;
+            }
+            $ftag = DataList::create('FlickrTag')->where("Value='".strtolower($tagName)."'")->first();
+            if (!$ftag) {
+                $ftag = FlickrTag::create();
+                $ftag->RawValue = $tagName;
+                $ftag->Value  = strtolower($tagName);
+                $ftag->write();
+            }
 
-		return $result;
-	}
+            $result->add($ftag);
+        }
 
+        return $result;
+    }
 }
