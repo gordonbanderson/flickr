@@ -15,6 +15,8 @@ class FlickrAuthor extends DataObject
 
     private static $has_many = array('FlickrPhotos' => 'Suilven\Flickr\Model\FlickrPhoto');
 
+    private static $table_name = 'FlickrAuthor';
+
     private static $summary_fields = array(
         'PathAlias' => 'URL',
         'DisplayName' => 'Display Name'

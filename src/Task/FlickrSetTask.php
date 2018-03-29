@@ -8,6 +8,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\i18n\i18n;
 use SilverStripe\Security\Permission;
+use Suilven\Flickr\Service\FlickrService;
 use Suilven\RealWorldPopulator\Gutenberg\Controller\GutenbergBookExtractBlogPost;
 
 /**
@@ -29,7 +30,7 @@ class FlickrSetTask extends BuildTask
     {
         $id = $_GET['id'];
 
-        $service = new \FlickrService();
+        $service = new FlickrService();
         $service->importSet($id);
     }
 

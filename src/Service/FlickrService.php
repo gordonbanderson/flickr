@@ -1,7 +1,14 @@
 <?php
 namespace Suilven\Flickr\Service;
 
+use Rezzza\Flickr\ApiFactory;
+use Rezzza\Flickr\Http\GuzzleAdapter;
+use Rezzza\Flickr\Metadata;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\ORM\DataObject;
+use Suilven\Flickr\Model\FlickrPhoto;
+use Suilven\Flickr\Model\FlickrSet;
 
 class FlickrService {
 
@@ -10,24 +17,27 @@ class FlickrService {
 	 */
 	private static $tagCache = array();
 
-    /**
-     * @var \Flickr\phpFlickr Handle on the PHP flickr service
-     */
-	private $f;
 
-	public function init() {
-		parent::init();
+	private $factory;
 
+	public function __construct() {
 		// get flickr details from config
-		$key = SilverStripe\Config::inst()->get( $this->class, 'api_key' );
-		$secret = Config::inst()->get( $this->class, 'secret' );
-		$access_token = Config::inst()->get( $this->class, 'access_token' );
+		$consumerKey = Config::inst()->get( 'Suilven\Flickr\Service\FlickrService', 'consumer_key' );
+        $consumerSecret = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'consumer_secret' );
+        $token = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'token' );
+        $tokenSecret = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'token_secret' );
 
-		$this->f = new \Flickr\phpFlickr( $key, $secret );
+        $metadata = new Metadata($consumerKey, $consumerSecret);
+        $metadata->setOauthAccess($token, $tokenSecret);
 
-		//$this->f->setToken( $access_token );
+        $this->factory  = new ApiFactory($metadata, new GuzzleAdapter());
 
-		if (!$key) {
+        error_log('CK=' . $consumerKey);
+
+
+
+
+		if (!$consumerKey) {
 			echo "In order to import photographs Flickr key, secret and access token must be provided";
 			die;
 		}
@@ -121,23 +131,50 @@ class FlickrService {
 		}
 */
 
-		$photos = $this->f->photosets_getPhotos( $flickrSetID,
-			'license, date_upload, date_taken, owner_name, icon_server, original_format, last_update, geo, tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, url_s, url_m, url_o, url_l,description',
-			null,
-		500);
 
-		$photoset = $photos['photoset'];
+        /**
+         *  $xmlPhotoList = $apiFactory->call('flickr.photosets.getPhotos', [
+        'photoset_id' => $photosetId,
+        'page' => $page,
+        ]);
+
+         */
+        $xml = $this->factory->call('flickr.photosets.getPhotos', [
+            'photoset_id' => 72157655349004983,
+            'extras' => 'license, date_upload, date_taken, owner_name, icon_server, original_format, last_update, geo, tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, url_s, url_m, url_o, url_l,description',
+
+        ]);
+
+
+
+        foreach ($xml->photoset->photo as $photo) {
+            error_log('photo!');
+            error_log(print_r($photo,1));
+
+        }
+
+
+        error_log(print_r($xml, 1));
+
+
+
+
+		$photoset = $xml->photoset;
 
 		$flickrSet = $this->getFlickrSet( $flickrSetID );
 
 		// reload from DB with date - note the use of quotes as flickr set id is a string
-		//$flickrSet = DataObject::get_one( 'FlickrSet', 'FlickrID=\''.$flickrSetID."'" );
+		//$flickrSet = DataObject::get_one( 'Suilven\Flickr\Model\FlickrSet', 'FlickrID=\''.$flickrSetID."'" );
 		$flickrSet->FirstPictureTakenAt = $photoset['photo'][0]['datetaken'];
 		$flickrSet->KeepClean = true;
 		$flickrSet->Title = $photoset['title'];
 		$flickrSet->write();
 
 		echo "Title set to : ".$flickrSet->Title;
+
+		error_log(print_r($flickrSet, 1));
+
+
 
 		if ( $flickrSet->Title == null ) {
 			echo( "ABORTING DUE TO NULL TITLE FOUND IN SET - ARE YOU AUTHORISED TO READ SET INFO?" );
@@ -206,7 +243,7 @@ class FlickrService {
 		$pathalias = $value['pathalias'];
 
 		// do we have a set object or not
-		$flickrPhoto = DataObject::get_one( 'FlickrPhoto', 'FlickrID='.$flickrPhotoID );
+		$flickrPhoto = DataObject::get_one( 'Suilven\Flickr\Model\FlickrPhoto', 'FlickrID='.$flickrPhotoID );
 
 		// if a set exists update data, otherwise create
 		if ( !$flickrPhoto ) {
@@ -366,12 +403,13 @@ class FlickrService {
 	*/
 	private function getFlickrSet( $flickrSetID ) {
 		// do we have a set object or not
-		$flickrSet = DataObject::get_one( 'FlickrSet', 'FlickrID=\''.$flickrSetID."'" );
+		$flickrSet = DataObject::get_one( 'Suilven\Flickr\Model\FlickrSet', 'FlickrID=\''.$flickrSetID."'" );
 
 		// if a set exists update data, otherwise create
-		if ( !$flickrSet ) {
+		//if ( !$flickrSet ) {
 			$flickrSet = new FlickrSet();
 			$setInfo = $this->f->photosets_getInfo( $flickrSetID );
+			error_log('INFO:'. print_r($setInfo,1));
 			$setTitle = $setInfo['title']['_content'];
 			$setDescription = $setInfo['description']['_content'];
 			$flickrSet->Title = $setTitle;
@@ -379,7 +417,7 @@ class FlickrService {
 			$flickrSet->FlickrID = $flickrSetID;
 			$flickrSet->KeepClean = true;
 			$flickrSet->write();
-		}
+		//}
 
 		return $flickrSet;
 	}

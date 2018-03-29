@@ -4,6 +4,8 @@ use SilverStripe\ORM\DataObject;
 
 class FlickrSet extends DataObject
 {
+    private static $table_name = 'FlickrSet';
+
     private static $db = array(
         'Title' => 'Varchar(255)',
         'FlickrID' => 'Varchar',

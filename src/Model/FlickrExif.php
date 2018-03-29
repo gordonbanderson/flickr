@@ -14,6 +14,8 @@ class FlickrExif extends DataObject
         'TagSpaceID' => 'Int'
     );
 
+    private static $table_name = 'FlickrExif';
+
     private static $belongs_many_many = array(
         'FlickrPhotos' => 'Suilven\Flickr\Model\FlickrPhoto'
      );
