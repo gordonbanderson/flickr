@@ -1,5 +1,6 @@
 <?php
 namespace Suilven\Flickr\Model;
+
 use SilverStripe\ORM\DataObject;
 
 class FlickrSet extends DataObject

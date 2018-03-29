@@ -33,7 +33,4 @@ class FlickrSetTask extends BuildTask
         $service = new FlickrService();
         $service->importSet($id);
     }
-
-
-
 }

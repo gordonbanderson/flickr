@@ -1,6 +1,7 @@
 <?php
 
 namespace Suilven\Flickr\Model;
+
 use SilverStripe\ORM\DataObject;
 
 class FlickrExif extends DataObject
