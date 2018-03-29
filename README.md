@@ -33,6 +33,10 @@ Via Composer
 $ composer require suilven/flickr
 ```
 
+## Configuration
+### Getting an API Key
+### YML Configuration
+
 ## Usage
 
 ``` php
