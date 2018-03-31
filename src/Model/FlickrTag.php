@@ -1,6 +1,8 @@
 <?php
 namespace Suilven\Flickr\Model;
 
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 
 class FlickrTag extends DataObject

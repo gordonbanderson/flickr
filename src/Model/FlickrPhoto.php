@@ -1,7 +1,12 @@
 <?php
 namespace Suilven\Flickr\Model;
 
+use Rezzza\Flickr\ApiFactory;
+use Rezzza\Flickr\Http\GuzzleAdapter;
+use Rezzza\Flickr\Metadata;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 
 class FlickrPhoto extends DataObject
 {
@@ -351,14 +356,15 @@ class FlickrPhoto extends DataObject
     {
         if (!isset($this->f)) {
             // get flickr details from config
-            $key = Config::inst()->get('FlickrController', 'api_key');
-            $secret = Config::inst()->get('FlickrController', 'secret');
-            $access_token = Config::inst()->get('FlickrController', 'access_token');
+            $consumerKey = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'consumer_key');
+            $consumerSecret = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'consumer_secret');
+            $token = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'token');
+            $tokenSecret = Config::inst()->get('Suilven\Flickr\Service\FlickrService', 'token_secret');
 
-            $this->f = new phpFlickr($key, $secret);
+            $metadata = new Metadata($consumerKey, $consumerSecret);
+            $metadata->setOauthAccess($token, $tokenSecret);
 
-            //Fleakr.auth_token    = ''
-            $this->f->setToken($access_token);
+            $this->factory  = new ApiFactory($metadata, new GuzzleAdapter());
         }
     }
 
@@ -401,30 +407,49 @@ class FlickrPhoto extends DataObject
     }
 
 
+    // @todo move into an API layer, keep model thin
     public function loadExif()
     {
-        echo "Loading exif\n";
         $this->initialiseFlickr();
-        $exifData = $this->f->photos_getExif($this->FlickrID);
+
+        $xml = $this->factory->call('flickr.photos.getExif', [
+            'photo_id' => $this->FlickrID,
+        ]);
+
+        error_log($xml->asXml());
+
 
         // delete any old exif data
         $sql = "DELETE from FlickrExif where FlickrPhotoID=".$this->ID;
         DB::query($sql);
 
-        // conversion factor or fixed legnth depending on model of camera
+        // conversion factor or fixed length depending on model of camera
         $focallength = -1;
         $fixFocalLength = 0;
         $focalConversionFactor = 1;
 
         echo "Storing exif data for ".$this->Title."\n";
-        foreach ($exifData['exif'] as $key => $exifInfo) {
+        foreach ($xml->photo->exif as $exifXml) {
+            error_log('EXIF!!!!!');
+            error_log($exifXml->asXml());
+
+            $attributes = $exifXml->attributes();
+
+
+            /*
+             * 	<exif tagspace="ICC-meas" tagspaceid="0" tag="MeasurementGeometry" label="Measurement Geometry">
+		<raw>Unknown (0)</raw>
+	</exif>
+
+             */
+
             DB::query('begin;');
             $exif = new FlickrExif();
-            $exif->TagSpace = $exifInfo['tagspace'];
-            $exif->TagSpaceID = $exifInfo['tagspaceid'];
-            $exif->Tag = $exifInfo['tag'];
-            $exif->Label = $exifInfo['label'];
-            $exif->Raw = $exifInfo['raw']['_content'];
+            $exif->TagSpace = (string) $exifXml->tagspace;
+            $exif->TagSpaceID = (int) $exifXml->tagspaceid;
+            $exif->Tag = (string) $exifXml->tag;
+            $exif->Label = (string) $exifXml->label;
+            $exif->Raw = (string) $exifXml->raw;
             $exif->FlickrPhotoID = $this->ID;
             //NO NEED TO SAVE HERE
             //$exif->write();
@@ -456,6 +481,7 @@ class FlickrPhoto extends DataObject
                     $fixFocalLength = 28;
                 }
 
+                // @todo make generic
                 if ($name === 'Canon IXUS 220 HS') {
                     $focalConversionFactor = 5.58139534884;
                 }
@@ -479,7 +505,6 @@ class FlickrPhoto extends DataObject
             }
         }
 
-        echo "/storing exif";
         DB::query('commit;');
     }
 
