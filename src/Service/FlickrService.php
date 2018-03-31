@@ -343,10 +343,8 @@ class FlickrService
         $flickrPhoto->write();
 
         error_log($singlePhotoInfo->asXml());
-        foreach($singlePhotoInfo->tags as $tags)
-        {
-            foreach($tags as $tag)
-            {
+        foreach ($singlePhotoInfo->tags as $tags) {
+            foreach ($tags as $tag) {
                 error_log($tag->asXml());
                 $tagNormalised = (string) $tag;
                 $tags = FlickrTag::get()->filter('Value', $tagNormalised);
@@ -366,7 +364,6 @@ class FlickrService
                 $ftags= $flickrPhoto->FlickrTags();
                 $ftags->add($tagDO);
             }
-
         }
 
 
@@ -386,7 +383,7 @@ class FlickrService
         $flickrSet = DataObject::get_one('Suilven\Flickr\Model\FlickrSet', 'FlickrID=\''.$flickrSetID."'");
 
         // if a set exists update data, otherwise create
-        if ( !$flickrSet ) {
+        if (!$flickrSet) {
             $flickrSet = new FlickrSet();
 
             $setInfo = $this->factory->call('flickr.photosets.getInfo', [

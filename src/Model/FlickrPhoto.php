@@ -437,9 +437,9 @@ class FlickrPhoto extends DataObject
 
 
             /*
-             * 	<exif tagspace="ICC-meas" tagspaceid="0" tag="MeasurementGeometry" label="Measurement Geometry">
-		<raw>Unknown (0)</raw>
-	</exif>
+             *  <exif tagspace="ICC-meas" tagspaceid="0" tag="MeasurementGeometry" label="Measurement Geometry">
+        <raw>Unknown (0)</raw>
+    </exif>
 
              */
 
