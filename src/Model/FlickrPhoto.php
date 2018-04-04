@@ -129,6 +129,17 @@ class FlickrPhoto extends DataObject
         return $this->stripProtocol($this->ThumbnailURL);
     }
 
+
+    private static $casting = [
+        'getThumbnailImage' => 'HTMLText'
+    ];
+
+    public function getThumbnailImage()
+    {
+        #return '<img src="{$this->ProtocolAgnosticThumbnailURL()}"/>';
+        return '<img src="test"/>';
+    }
+
     public function ProtocolAgnosticOriginalURL()
     {
         return $this->stripProtocol($this->OriginalURL);
@@ -416,7 +427,7 @@ class FlickrPhoto extends DataObject
             'photo_id' => $this->FlickrID,
         ]);
 
-        error_log($xml->asXml());
+        error_log('EXIF:' . $xml->asXml());
 
 
         // delete any old exif data
@@ -430,7 +441,8 @@ class FlickrPhoto extends DataObject
 
         echo "Storing exif data for ".$this->Title."\n";
         foreach ($xml->photo->exif as $exifXml) {
-            error_log('EXIF!!!!!');
+            error_log("\n\n\n\n");
+            error_log('------- EXIF!!!!!');
             error_log($exifXml->asXml());
 
             $attributes = $exifXml->attributes();
@@ -443,18 +455,18 @@ class FlickrPhoto extends DataObject
 
              */
 
-            DB::query('begin;');
             $exif = new FlickrExif();
-            $exif->TagSpace = (string) $exifXml->tagspace;
-            $exif->TagSpaceID = (int) $exifXml->tagspaceid;
-            $exif->Tag = (string) $exifXml->tag;
-            $exif->Label = (string) $exifXml->label;
+            $exifAttr = $exifXml->attributes();
+            $exif->TagSpace = (string) $exifAttr->tagspace;
+            $exif->TagSpaceID = (int) $exifAttr->tagspaceid;
+            $exif->Tag = (string) $exifAttr->tag;
+            $exif->Label = (string) $exifAttr->label;
             $exif->Raw = (string) $exifXml->raw;
             $exif->FlickrPhotoID = $this->ID;
-            //NO NEED TO SAVE HERE
-            //$exif->write();
 
-            echo "- {$exif->Tag} = {$exif->Raw}\n";
+           // error_log('EXIF OBJ: ' . print_r($exif, 1));
+
+            echo "- TAG=>RAW {$exif->Tag} => {$exif->raw}\n";
 
             if ($exif->Tag == 'FocalLength') {
                 $raw = str_replace(' mm', '', $exif->Raw);
@@ -462,6 +474,7 @@ class FlickrPhoto extends DataObject
             } elseif ($exif->Tag == 'ImageUniqueID') {
                     $this->ImageUniqueID = $exif->Raw;
             } elseif ($exif->Tag == 'ISO') {
+                error_log('FOUND ISO!!!!!');
                     $this->ISO = $exif->Raw;
             } elseif ($exif->Tag == 'ExposureTime') {
                     $this->ShutterSpeed = $exif->Raw;
@@ -491,6 +504,8 @@ class FlickrPhoto extends DataObject
                 }
             }
 
+            $exif->write();
+
             $exif = null;
             gc_collect_cycles();
         }
@@ -505,7 +520,7 @@ class FlickrPhoto extends DataObject
             }
         }
 
-        DB::query('commit;');
+        $this->write();
     }
 
 

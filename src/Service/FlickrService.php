@@ -220,10 +220,12 @@ class FlickrService
         // now download exifs
         $ctr = 0;
         foreach ($photoset->photo as $photo) {
-            echo "IMPORTING EXIF {$ctr}/$numberOfPics\n";
+            echo ">>>> IMPORTING EXIF {$ctr}/$numberOfPics\n";
             $flickrPhotoID =  (int) $photo->attributes()->id;
             error_log('FPID: ' . $flickrPhotoID);
             error_log($photo->asXml());
+
+            /** @var FlickrPhoto $flickrPhoto */
             $flickrPhoto = FlickrPhoto::get()->filter('FlickrID', $flickrPhotoID)->first();
             $flickrPhoto->loadExif();
             $flickrPhoto->write();
