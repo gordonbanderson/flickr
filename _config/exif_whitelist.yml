@@ -1,0 +1,54 @@
+---
+Name: flickr_exif_whitelist
+---
+
+# Only Exif data with the following tag will be saved.  This is to avoid database bloat and also import time.
+Suilven\Flickr\Model\FlickrExif:
+  whitelist:
+    - AutoExposureBracketing
+    - AutoISO
+    - BaseISO
+    - CameraOrientation
+    - CameraTemperature
+    - CameraType
+    - CanonExposureMode
+    - CanonFirmwareVersion
+    - CanonFlashMode
+    - CanonImageHeight
+    - CanonImageSize
+    - CanonImageType
+    - CanonImageWidth
+    - CanonModelID
+    - DateTimeOriginal
+    - ExposureCompensation
+    - ExposureLevelIncrements
+    - ExposureMode
+    - ExposureProgram
+    - ExposureTime
+    - FirmwareVersion
+    - Flash
+    - FlashActivity
+    - FNumber
+    - FocusDistanceLower
+    - FocusDistanceUpper
+    - FocusMode
+    - HighISONoiseReduction
+    - ImageUniqueID
+    - ISO
+    - LensModel
+    - LensType
+    - LongExposureNoiseReduction
+    - LongExposureNoiseReduction2
+    - MacroMode
+    - Make
+    - ManualFlashOutput
+    - MaxAperture
+    - MaxFocalLength
+    - MinAperture
+    - MinFocalLength
+    - MirrorLockup
+    - Model
+    - ModifyDate
+    - Quality
+    - SelfTimer
+    - WhiteBalance

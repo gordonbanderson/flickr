@@ -5,6 +5,7 @@ use Rezzza\Flickr\ApiFactory;
 use Rezzza\Flickr\Http\GuzzleAdapter;
 use Rezzza\Flickr\Metadata;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 
@@ -421,6 +422,7 @@ class FlickrPhoto extends DataObject
     // @todo move into an API layer, keep model thin
     public function loadExif()
     {
+        $exifWhiteList = Config::inst()->get('Suilven\Flickr\Model\FlickrExif', 'whitelist');
         $this->initialiseFlickr();
 
         $xml = $this->factory->call('flickr.photos.getExif', [
@@ -439,6 +441,8 @@ class FlickrPhoto extends DataObject
         $fixFocalLength = 0;
         $focalConversionFactor = 1;
 
+        $exifArray = [];
+
         echo "Storing exif data for ".$this->Title."\n";
         foreach ($xml->photo->exif as $exifXml) {
             error_log("\n\n\n\n");
@@ -446,14 +450,6 @@ class FlickrPhoto extends DataObject
             error_log($exifXml->asXml());
 
             $attributes = $exifXml->attributes();
-
-
-            /*
-             *  <exif tagspace="ICC-meas" tagspaceid="0" tag="MeasurementGeometry" label="Measurement Geometry">
-        <raw>Unknown (0)</raw>
-    </exif>
-
-             */
 
             $exif = new FlickrExif();
             $exifAttr = $exifXml->attributes();
@@ -504,10 +500,12 @@ class FlickrPhoto extends DataObject
                 }
             }
 
-            $exif->write();
+            if (in_array($exif->Tag, $exifWhiteList)) {
+                $exifArray[] = $exif;
+            }
 
-            $exif = null;
-            gc_collect_cycles();
+
+            error_log('EA SIZE: ' . sizeof($exifArray));
         }
 
         // try and fix the 35mm focal length
@@ -519,6 +517,18 @@ class FlickrPhoto extends DataObject
                 $this->FocalLength35mm = round($f);
             }
         }
+
+        // experimentation shows that this is 12x faster with the begin and commit for a transaction, 2s vs 24s for 700 records
+        $start = microtime(true);
+        DB::query('BEGIN;');
+        foreach($exifArray as $exifObj)
+        {
+            error_log('WRITING EXIF: ');
+            error_log($exifObj->write());
+        }
+        DB::query('COMMIT;');
+        $elapsed = microtime(true) - $start;
+        error_log('ELAPSED: ' . $elapsed);
 
         $this->write();
     }
