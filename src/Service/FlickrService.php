@@ -357,9 +357,10 @@ class FlickrService
 
                 if (!$tagDO) {
                     $tagDO = new FlickrTag();
-                    $tagDO->FlickrID = (int) $tag->id;
+                    $tagDO->FlickrID = (string) $tag->attributes()->id;
                     $tagDO->Value = (string) $tag;
-                    $tagDO->RawValue = (string) $tag->raw;
+                    $tagDO->RawValue = (string)  $tag->attributes()->raw;
+                    
                     $tagDO->write();
                 }
 
