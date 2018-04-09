@@ -306,6 +306,8 @@ class FlickrService
         $lat = number_format((float)$attributes->latitude, 15);
         $lon = number_format((float)$attributes->longitude, 15);
 
+        error_log("LL={$lat},{$lon}");
+
         if (isset($attributes['place_id'])) {
             $flickrPhoto->FlickrPlaceID = (string) $attributes->place_id;
         }
@@ -360,7 +362,7 @@ class FlickrService
                     $tagDO->FlickrID = (string) $tag->attributes()->id;
                     $tagDO->Value = (string) $tag;
                     $tagDO->RawValue = (string)  $tag->attributes()->raw;
-                    
+
                     $tagDO->write();
                 }
 

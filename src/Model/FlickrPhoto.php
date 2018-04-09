@@ -24,6 +24,11 @@ class FlickrPhoto extends DataObject
 
         'FlickrLastUpdated' => 'Date',
         'GeoIsPublic' => 'Boolean',
+
+        // these should come from mappable but it's not 4.x ready
+        'Lat' => 'Decimal(18,15)',
+        'Lon' => 'Decimal(18,15)',
+
         'FlickrWoeID' => 'Int',
         'FlickrPlaceID' => 'Varchar(255)',
         'GeoIsPublic' => 'Boolean',
