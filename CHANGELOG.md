@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.2](https://github.com/gordonbanderson/flickr/tree/0.2) (2018-04-09)
+[Full Changelog](https://github.com/gordonbanderson/flickr/compare/0.1...0.2)
+
 ## [0.1](https://github.com/gordonbanderson/flickr/tree/0.1) (2018-03-29)
 
 
