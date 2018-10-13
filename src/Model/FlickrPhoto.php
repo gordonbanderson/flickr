@@ -8,10 +8,16 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\FieldType\DBField;
 
 class FlickrPhoto extends DataObject
 {
     private static $table_name = 'FlickrPhoto';
+
+    private static $searchable_fields = [
+        'Title',
+        'Description'
+    ];
 
     private static $db = array(
         'Title' => 'Varchar(255)',
@@ -294,7 +300,7 @@ class FlickrPhoto extends DataObject
         $fields->addFieldToTab('Root.Main', new TextField('QuickTags', 'Enter tags here separated by commas'));
 
         $gridConfig = GridFieldConfig_RelationEditor::create();//->addComponent( new GridFieldSortableRows( 'Value' ) );
-        $gridConfig->getComponentByType('GridFieldAddExistingAutocompleter')->setSearchFields(array( 'Value','RawValue' ));
+        // @todo Fix $gridConfig->getComponentByType('GridFieldAddExistingAutocompleter')->setSearchFields(array( 'Value','RawValue' ));
         $gridField = new GridField("Tags", "List of Tags", $this->FlickrTags(), $gridConfig);
         $fields->addFieldToTab("Root.Main", $gridField);
 
