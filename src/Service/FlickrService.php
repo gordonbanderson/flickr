@@ -38,9 +38,6 @@ class FlickrService
 
         error_log('CK=' . $consumerKey);
 
-
-
-
         if (!$consumerKey) {
             echo "In order to import photographs Flickr key, secret and access token must be provided";
             die;
