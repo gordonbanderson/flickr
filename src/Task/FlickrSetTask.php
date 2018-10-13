@@ -3,6 +3,7 @@
 namespace Suilven\Flickr\Task;
 
 use SilverStripe\Dev\BuildTask;
+use Suilven\Flickr\Model\FlickrSet;
 use Suilven\Flickr\Service\FlickrService;
 
 /**
@@ -22,9 +23,27 @@ class FlickrSetTask extends BuildTask
 
     public function run($request)
     {
-        $id = $_GET['id'];
 
+        $id = $_GET['id'];
         $service = new FlickrService();
-        $service->importSet($id);
+        $set = $service->importSet($id);
+
+        $photos = $set->FlickrPhotos();
+
+        error_log('Photo');
+        foreach($photos as $photo) {
+            error_log('  photo_' . $photo->ID . ':');
+            error_log('    Title: ' . $photo->Title);
+            error_log('    Description: ' . $photo->Description);
+            error_log('    Latitude: ' . $photo->Lat);
+            error_log('    Longitude: ' . $photo->Lon);
+            error_log('    Aperture: ' . $photo->Aperture);
+            error_log('    TakenAt: ' . $photo->TakenAt);
+            error_log('    FlickrPlaceID: ' . $photo->FlickrPlaceID);
+            error_log('    ShutterSpeed: ' . $photo->ShutterSpeed);
+            error_log('    FocalLength35mm: ' . $photo->FocalLength35mm);
+            error_log('    ISO: ' . $photo->ISO);
+        }
+
     }
 }
