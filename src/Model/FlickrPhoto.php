@@ -4,11 +4,16 @@ namespace Suilven\Flickr\Model;
 use Rezzza\Flickr\ApiFactory;
 use Rezzza\Flickr\Http\GuzzleAdapter;
 use Rezzza\Flickr\Metadata;
+use SilverStripe\Assets\Image;
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TabSet;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\View\ArrayData;
 
 class FlickrPhoto extends DataObject
 {
@@ -106,8 +111,8 @@ class FlickrPhoto extends DataObject
 
 
     private static $has_one = array(
-        'LocalCopyOfImage' => 'Image',
-        'Photographer' => 'Suilven\Flickr\Model\FlickrAuthor'
+        'LocalCopyOfImage' => Image::class,
+        'Photographer' => FlickrAuthor::class
     );
 
 
@@ -229,15 +234,25 @@ class FlickrPhoto extends DataObject
     {
         //Requirements::css( FLICKR_EDIT_TOOLS_PATH . '/css/flickredit.js' );
 
+        error_log(print_r(Controller::curr()->getRequest()->allParams(), 1));
         $flickrSetID = Controller::curr()->request->param('ID');
-        $params = Controller::curr()->request->params();
+        error_log('Flickr set id: ' . $flickrSetID);
+
+        /*
+         * OLD CODE
+
         $url = $_GET['url'];
+        error_log('ID:', $flickrSetID);
+        error_log('URL:', $url);
+        error_log(print_r($_GET, 1));
         $splits = explode('/FlickrSet/item/', $url);
         $setid = null;
         if (sizeof($splits) == 2) {
             $splits = explode('/', $splits[1]);
             $setid = $splits[0];
         }
+
+        */
 
 
         //$fields = new FieldList();
@@ -248,7 +263,7 @@ class FlickrPhoto extends DataObject
 
         $forTemplate = new ArrayData(array(
                 'FlickrPhoto' => $this,
-                'FlickrSetID' => $setid
+                'FlickrSetID' => $flickrSetID
         ));
         $imageHtml = $forTemplate->renderWith('FlickrImageEditing');
 
